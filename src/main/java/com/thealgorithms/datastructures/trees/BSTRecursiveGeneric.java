@@ -9,10 +9,11 @@ import java.util.List;
  * <p>
  * A recursive implementation of generic type BST.
  *
- * Reference: https://en.wikipedia.org/wiki/Binary_search_tree
+ * Reference: <a href="https://en.wikipedia.org/wiki/Binary_search_tree">Wiki links for BST</a>
  * </p>
  *
- * @author [Madhur Panwar](https://github.com/mdrpanwar)
+ * @author [Madhur Panwar](<a href="https://github.com/mdrpanwar">git-Madhur Panwar</a>)
+ * @author [Udaya Krishnan M](<a href="https://github.com/UdayaKrishnanM/">git-Udaya Krishnan M</a>) {added prettyDisplay() method}
  */
 public class BSTRecursiveGeneric<T extends Comparable<T>> {
 
@@ -29,6 +30,29 @@ public class BSTRecursiveGeneric<T extends Comparable<T>> {
     }
 
     /**
+     * Displays the tree is a structured format
+     */
+    public void prettyDisplay() {
+        prettyDisplay(root, 0);
+    }
+
+    private void prettyDisplay(Node<T> node, int level) {
+        if (node == null) {
+            return;
+        }
+        prettyDisplay(node.right, level + 1);
+        if (level != 0) {
+            for (int i = 0; i < level - 1; i++) {
+                System.out.print("|\t");
+            }
+            System.out.println("|---->" + node.data);
+        } else {
+            System.out.println(node.data);
+        }
+        prettyDisplay(node.left, level + 1);
+    }
+
+    /**
      * main function for testing
      */
     public static void main(String[] args) {
@@ -38,44 +62,67 @@ public class BSTRecursiveGeneric<T extends Comparable<T>> {
 
         integerTree.add(5);
         integerTree.add(10);
-        integerTree.add(9);
-        assert !integerTree.find(4) : "4 is not yet present in BST";
-        assert integerTree.find(10) : "10 should be present in BST";
+        integerTree.add(-9);
+        integerTree.add(4);
+        integerTree.add(3);
+        integerTree.add(1);
+        System.out.println("Pretty Display of current tree is:");
+        integerTree.prettyDisplay();
+        assert !integerTree.find(4)
+            : "4 is not yet present in BST";
+        assert integerTree.find(10)
+            : "10 should be present in BST";
         integerTree.remove(9);
-        assert !integerTree.find(9) : "9 was just deleted from BST";
+        assert !integerTree.find(9)
+            : "9 was just deleted from BST";
         integerTree.remove(1);
-        assert !integerTree.find(1) : "Since 1 was not present so find deleting would do no change";
+        assert !integerTree.find(1)
+            : "Since 1 was not present so find deleting would do no change";
         integerTree.add(20);
         integerTree.add(70);
-        assert integerTree.find(70) : "70 was inserted but not found";
+        assert integerTree.find(70)
+            : "70 was inserted but not found";
         /*
-     Will print in following order
-     5 10 20 70
+            Will print in following order
+            5 10 20 70
          */
+        System.out.println("Pretty Display of current tree is:");
+        integerTree.prettyDisplay();
         integerTree.inorder();
+        System.out.println("Pretty Display of current tree is:");
+        integerTree.prettyDisplay();
         System.out.println();
         System.out.println("Testing for string data...");
         // String
         BSTRecursiveGeneric<String> stringTree = new BSTRecursiveGeneric<String>();
 
         stringTree.add("banana");
+        stringTree.add("apple");
         stringTree.add("pineapple");
         stringTree.add("date");
-        assert !stringTree.find("girl") : "girl is not yet present in BST";
-        assert stringTree.find("pineapple") : "10 should be present in BST";
+        assert !stringTree.find("girl")
+            : "girl is not yet present in BST";
+        assert stringTree.find("pineapple")
+            : "10 should be present in BST";
         stringTree.remove("date");
-        assert !stringTree.find("date") : "date was just deleted from BST";
+        assert !stringTree.find("date")
+            : "date was just deleted from BST";
         stringTree.remove("boy");
-        assert !stringTree.find("boy") : "Since boy was not present so deleting would do no change";
+        assert !stringTree.find("boy")
+            : "Since boy was not present so deleting would do no change";
         stringTree.add("india");
         stringTree.add("hills");
-        assert stringTree.find("hills") : "hills was inserted but not found";
+        assert stringTree.find("hills")
+            : "hills was inserted but not found";
+        System.out.println("Pretty Display of current tree is:");
+        stringTree.prettyDisplay();
         /*
      Will print in following order
      banana hills india pineapple
          */
         stringTree.inorder();
-
+        System.out.println("Pretty Display of current tree is:");
+        stringTree.prettyDisplay();
     }
 
     /**
@@ -210,7 +257,7 @@ public class BSTRecursiveGeneric<T extends Comparable<T>> {
     }
 
     /**
-     * Serach recursively if the given value is present in BST or not.
+     * Search recursively if the given value is present in BST or not.
      *
      * @param node the node under which to check
      * @param data the value to be checked

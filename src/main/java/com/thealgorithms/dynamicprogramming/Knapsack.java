@@ -1,38 +1,78 @@
 package com.thealgorithms.dynamicprogramming;
 
+import java.util.Arrays;
+
 /**
- * A DynamicProgramming based solution for 0-1 Knapsack problem
+ * 0/1 Knapsack Problem - Dynamic Programming solution.
+ *
+ * This algorithm solves the classic optimization problem where we have n items,
+ * each with a weight and a value. The goal is to maximize the total value
+ * without exceeding the knapsack's weight capacity.
+ *
+ * Time Complexity: O(n * W)
+ * Space Complexity: O(W)
+ *
+ * Example:
+ * values = {60, 100, 120}
+ * weights = {10, 20, 30}
+ * W = 50
+ * Output: 220
+ *
+ * @author Arpita
+ * @see <a href="https://en.wikipedia.org/wiki/Knapsack_problem">Knapsack Problem</a>
  */
-public class Knapsack {
+public final class Knapsack {
 
-    private static int knapSack(int W, int wt[], int val[], int n) throws IllegalArgumentException {
-        if (wt == null || val == null) {
-            throw new IllegalArgumentException();
+    private Knapsack() {
+    }
+
+    /**
+     * Validates the input to ensure correct constraints.
+     */
+    private static void throwIfInvalidInput(final int weightCapacity, final int[] weights, final int[] values) {
+        if (weightCapacity < 0) {
+            throw new IllegalArgumentException("Weight capacity should not be negative.");
         }
-        int i, w;
-        int rv[][] = new int[n + 1][W + 1]; // rv means return value
+        if (weights == null || values == null || weights.length != values.length) {
+            throw new IllegalArgumentException("Weights and values must be non-null and of the same length.");
+        }
+        if (Arrays.stream(weights).anyMatch(w -> w <= 0)) {
+            throw new IllegalArgumentException("Weights must be positive.");
+        }
+    }
 
-        // Build table rv[][] in bottom up manner
-        for (i = 0; i <= n; i++) {
-            for (w = 0; w <= W; w++) {
-                if (i == 0 || w == 0) {
-                    rv[i][w] = 0;
-                } else if (wt[i - 1] <= w) {
-                    rv[i][w] = Math.max(val[i - 1] + rv[i - 1][w - wt[i - 1]], rv[i - 1][w]);
-                } else {
-                    rv[i][w] = rv[i - 1][w];
-                }
+    /**
+     * Solves the 0/1 Knapsack problem using Dynamic Programming (bottom-up approach).
+     *
+     * @param weightCapacity The maximum weight capacity of the knapsack.
+     * @param weights        The array of item weights.
+     * @param values         The array of item values.
+     * @return The maximum total value achievable without exceeding capacity.
+     */
+    public static int knapSack(final int weightCapacity, final int[] weights, final int[] values) {
+        throwIfInvalidInput(weightCapacity, weights, values);
+
+        int[] dp = new int[weightCapacity + 1];
+
+        // Fill dp[] array iteratively
+        for (int i = 0; i < values.length; i++) {
+            for (int w = weightCapacity; w >= weights[i]; w--) {
+                dp[w] = Math.max(dp[w], dp[w - weights[i]] + values[i]);
             }
         }
 
-        return rv[n][W];
+        return dp[weightCapacity];
     }
 
-    // Driver program to test above function
-    public static void main(String args[]) {
-        int val[] = new int[]{50, 100, 130};
-        int wt[] = new int[]{10, 20, 40};
-        int W = 50;
-        System.out.println(knapSack(W, wt, val, val.length));
+    /*
+    // Example main method for local testing only.
+    public static void main(String[] args) {
+        int[] values = {60, 100, 120};
+        int[] weights = {10, 20, 30};
+        int weightCapacity = 50;
+
+        int maxValue = knapSack(weightCapacity, weights, values);
+        System.out.println("Maximum value = " + maxValue); // Output: 220
     }
+    */
 }

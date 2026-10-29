@@ -1,16 +1,18 @@
 package com.thealgorithms.datastructures.lists;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.StringJoiner;
 
 /**
- * https://en.wikipedia.org/wiki/Linked_list
+ * <a href="https://en.wikipedia.org/wiki/Linked_list">wikipedia</a>
  */
-public class SinglyLinkedList {
+public class SinglyLinkedList implements Iterable<Integer> {
 
     /**
      * Head refer to the front of the list
      */
-    private Node head;
+    private SinglyLinkedListNode head;
 
     /**
      * Size of SinglyLinkedList
@@ -31,174 +33,143 @@ public class SinglyLinkedList {
      * @param head the head node of list
      * @param size the size of list
      */
-    public SinglyLinkedList(Node head, int size) {
+    public SinglyLinkedList(SinglyLinkedListNode head, int size) {
         this.head = head;
         this.size = size;
     }
 
     /**
-     * Inserts an element at the head of the list
-     *
-     * @param x element to be added
-     */
-    public void insertHead(int x) {
-        insertNth(x, 0);
-    }
-
-    /**
-     * Insert an element at the tail of the list
-     *
-     * @param data element to be added
-     */
-    public void insert(int data) {
-        insertNth(data, size);
-    }
-
-    /**
-     * Inserts a new node at a specified position of the list
-     *
-     * @param data data to be stored in a new node
-     * @param position position at which a new node is to be inserted
-     */
-    public void insertNth(int data, int position) {
-        checkBounds(position, 0, size);
-        Node newNode = new Node(data);
-        if (head == null) {
-            /* the list is empty */
-            head = newNode;
-            size++;
-            return;
-        } else if (position == 0) {
-            /* insert at the head of the list */
-            newNode.next = head;
-            head = newNode;
-            size++;
-            return;
-        }
-        Node cur = head;
-        for (int i = 0; i < position - 1; ++i) {
-            cur = cur.next;
-        }
-        newNode.next = cur.next;
-        cur.next = newNode;
-        size++;
-    }
-
-    /**
      * Detects if there is a loop in the singly linked list using floy'd turtle
      * and hare algorithm.
-  *
+     *
      */
     public boolean detectLoop() {
-        Node currentNodeFast = head;
-        Node currentNodeSlow = head;
-        boolean flag = false;
-        while (currentNodeFast != null && currentNodeFast.next != null && currentNodeSlow != null && currentNodeSlow.next != null) {
+        SinglyLinkedListNode currentNodeFast = head;
+        SinglyLinkedListNode currentNodeSlow = head;
+        while (currentNodeFast != null && currentNodeFast.next != null) {
             currentNodeFast = currentNodeFast.next.next;
             currentNodeSlow = currentNodeSlow.next;
             if (currentNodeFast == currentNodeSlow) {
-                flag = true;
-                break;
+                return true;
             }
         }
-        return flag;
+        return false;
+    }
+
+    /**
+     * Return the node in the middle of the list
+     * If the length of the list is even then return item number length/2
+     * @return middle node of the list
+     */
+    public SinglyLinkedListNode middle() {
+        if (head == null) {
+            return null;
+        }
+        SinglyLinkedListNode firstCounter = head;
+        SinglyLinkedListNode secondCounter = firstCounter.next;
+        while (secondCounter != null && secondCounter.next != null) {
+            firstCounter = firstCounter.next;
+            secondCounter = secondCounter.next.next;
+        }
+        return firstCounter;
     }
 
     /**
      * Swaps nodes of two given values a and b.
-  *
+     *
      */
-    public void swapNodes(int a, int b) {
-        Node currentNode = head;
-        Node temp = null;
-        while (currentNode != null) {
-            if (currentNode.next.value == a) {
-                temp = currentNode.next;
-            }
-            if (currentNode.next.value == b) {
-                currentNode.next = temp;
-            }
-            currentNode = currentNode.next;
+    public void swapNodes(int valueFirst, int valueSecond) {
+        if (valueFirst == valueSecond) {
+            return;
         }
+        SinglyLinkedListNode previousA = null;
+        SinglyLinkedListNode currentA = head;
+        while (currentA != null && currentA.value != valueFirst) {
+            previousA = currentA;
+            currentA = currentA.next;
+        }
+
+        SinglyLinkedListNode previousB = null;
+        SinglyLinkedListNode currentB = head;
+        while (currentB != null && currentB.value != valueSecond) {
+            previousB = currentB;
+            currentB = currentB.next;
+        }
+        /* If either of 'a' or 'b' is not present, then return */
+        if (currentA == null || currentB == null) {
+            return;
+        }
+
+        // If 'a' is not head node of list
+        if (previousA != null) {
+            previousA.next = currentB;
+        } else {
+            // make 'b' as the new head
+            head = currentB;
+        }
+
+        // If 'b' is not head node of list
+        if (previousB != null) {
+            previousB.next = currentA;
+        } else {
+            // Make 'a' as new head
+            head = currentA;
+        }
+        // Swap next pointer
+
+        var temp = currentA.next;
+        currentA.next = currentB.next;
+        currentB.next = temp;
     }
 
     /**
-     * Reverse a singly linked list from a given node till the end
-  *
+     * Reverse a singly linked list[Iterative] from a given node till the end
+     *
      */
-    Node reverseList(Node node) {
-        Node prev = null, curr = node, next;
-        while (curr != null) {
-            next = curr.next;
+    public SinglyLinkedListNode reverseListIter(SinglyLinkedListNode node) {
+        SinglyLinkedListNode prev = null;
+        SinglyLinkedListNode curr = node;
+
+        while (curr != null && curr.next != null) {
+            var next = curr.next;
             curr.next = prev;
             prev = curr;
             curr = next;
         }
-        node = prev;
-        return node;
-    }
-
-    /**
-     * Deletes a node at the head
-     */
-    public void deleteHead() {
-        deleteNth(0);
-    }
-
-    /**
-     * Deletes an element at the tail
-     */
-    public void delete() {
-        deleteNth(size - 1);
-    }
-
-    /**
-     * Deletes an element at Nth position
-     */
-    public void deleteNth(int position) {
-        checkBounds(position, 0, size - 1);
-        if (position == 0) {
-            Node destroy = head;
-            head = head.next;
-            destroy = null;
-            /* clear to let GC do its work */
-            size--;
-            return;
+        // when curr.next==null, the current element is left without pointing it to its prev,so
+        if (curr != null) {
+            curr.next = prev;
+            prev = curr;
         }
-        Node cur = head;
-        for (int i = 0; i < position - 1; ++i) {
-            cur = cur.next;
+        // prev will be pointing to the last element in the Linkedlist, it will be the new head of
+        // the reversed linkedlist
+        return prev;
+    }
+    /**
+     * Reverse a singly linked list[Recursive] from a given node till the end
+     *
+     */
+    public SinglyLinkedListNode reverseListRec(SinglyLinkedListNode head) {
+        if (head == null || head.next == null) {
+            return head;
         }
 
-        Node destroy = cur.next;
-        cur.next = cur.next.next;
-        destroy = null; // clear to let GC do its work
+        SinglyLinkedListNode prev = null;
+        SinglyLinkedListNode h2 = reverseListRec(head.next);
 
-        size--;
-    }
+        head.next.next = head;
+        head.next = prev;
 
-    /**
-     * @param position to check position
-     * @param low low index
-     * @param high high index
-     * @throws IndexOutOfBoundsException if {@code position} not in range
-     * {@code low} to {@code high}
-     */
-    public void checkBounds(int position, int low, int high) {
-        if (position > high || position < low) {
-            throw new IndexOutOfBoundsException(position + "");
-        }
+        return h2;
     }
 
     /**
      * Clear all nodes in the list
      */
     public void clear() {
-        Node cur = head;
+        SinglyLinkedListNode cur = head;
         while (cur != null) {
-            Node prev = cur;
             cur = cur.next;
-            prev = null; // clear to let GC do its work
         }
         head = null;
         size = 0;
@@ -227,8 +198,16 @@ public class SinglyLinkedList {
      *
      * @return head of the list.
      */
-    public Node getHead() {
+    public SinglyLinkedListNode getHead() {
         return head;
+    }
+
+    /**
+     * Set head of the list.
+     *
+     */
+    public void setHead(SinglyLinkedListNode head) {
+        this.head = head;
     }
 
     /**
@@ -238,10 +217,8 @@ public class SinglyLinkedList {
      */
     public int count() {
         int count = 0;
-        Node cur = head;
-        while (cur != null) {
-            cur = cur.next;
-            count++;
+        for (final var element : this) {
+            ++count;
         }
         return count;
     }
@@ -253,15 +230,142 @@ public class SinglyLinkedList {
      * @return {@code true} if key is present in the list, otherwise
      * {@code false}.
      */
-    public boolean search(int key) {
-        Node cur = head;
-        while (cur != null) {
-            if (cur.value == key) {
+    public boolean search(final int key) {
+        for (final var element : this) {
+            if (element == key) {
                 return true;
             }
-            cur = cur.next;
         }
         return false;
+    }
+
+    @Override
+    public String toString() {
+        StringJoiner joiner = new StringJoiner("->");
+        for (final var element : this) {
+            joiner.add(element + "");
+        }
+        return joiner.toString();
+    }
+
+    public void deleteDuplicates() {
+        SinglyLinkedListNode pred = head;
+        // predecessor = the node
+        // having sublist of its duplicates
+        SinglyLinkedListNode newHead = head;
+        while (newHead != null) {
+            // if it's a beginning of duplicates sublist
+            // skip all duplicates
+            if (newHead.next != null && newHead.value == newHead.next.value) {
+                // move till the end of duplicates sublist
+                while (newHead.next != null && newHead.value == newHead.next.value) {
+                    newHead = newHead.next;
+                }
+                // skip all duplicates
+                pred.next = newHead.next;
+                newHead = null;
+                // otherwise, move predecessor
+            }
+            // move forward
+            pred = pred.next;
+            newHead = pred;
+        }
+    }
+
+    public void print() {
+        SinglyLinkedListNode temp = head;
+        while (temp != null && temp.next != null) {
+            System.out.print(temp.value + "->");
+            temp = temp.next;
+        }
+        if (temp != null) {
+            System.out.print(temp.value);
+            System.out.println();
+        }
+    }
+
+    /**
+     * Inserts an element at the head of the list
+     *
+     * @param x element to be added
+     */
+    public void insertHead(int x) {
+        insertNth(x, 0);
+    }
+
+    /**
+     * Insert an element at the tail of the list
+     *
+     * @param data element to be added
+     */
+    public void insert(int data) {
+        insertNth(data, size);
+    }
+
+    /**
+     * Inserts a new node at a specified position of the list
+     *
+     * @param data data to be stored in a new node
+     * @param position position at which a new node is to be inserted
+     */
+    public void insertNth(int data, int position) {
+        checkBounds(position, 0, size);
+        SinglyLinkedListNode newNode = new SinglyLinkedListNode(data);
+        if (head == null) {
+            /* the list is empty */
+            head = newNode;
+            size++;
+            return;
+        }
+        if (position == 0) {
+            /* insert at the head of the list */
+            newNode.next = head;
+            head = newNode;
+            size++;
+            return;
+        }
+
+        SinglyLinkedListNode cur = head;
+        for (int i = 0; i < position - 1; ++i) {
+            cur = cur.next;
+        }
+        newNode.next = cur.next;
+        cur.next = newNode;
+        size++;
+    }
+
+    /**
+     * Deletes a node at the head
+     */
+    public void deleteHead() {
+        deleteNth(0);
+    }
+
+    /**
+     * Deletes an element at the tail
+     */
+    public void delete() {
+        deleteNth(size - 1);
+    }
+
+    /**
+     * Deletes an element at Nth position
+     */
+    public void deleteNth(int position) {
+        checkBounds(position, 0, size - 1);
+        if (position == 0) {
+            head = head.next;
+            /* clear to let GC do its work */
+            size--;
+            return;
+        }
+        SinglyLinkedListNode cur = head;
+        for (int i = 0; i < position - 1; ++i) {
+            cur = cur.next;
+        }
+
+        cur.next = cur.next.next;
+        size--;
     }
 
     /**
@@ -272,22 +376,24 @@ public class SinglyLinkedList {
      */
     public int getNth(int index) {
         checkBounds(index, 0, size - 1);
-        Node cur = head;
+        SinglyLinkedListNode cur = head;
         for (int i = 0; i < index; ++i) {
             cur = cur.next;
         }
         return cur.value;
     }
 
-    @Override
-    public String toString() {
-        StringJoiner joiner = new StringJoiner("->");
-        Node cur = head;
-        while (cur != null) {
-            joiner.add(cur.value + "");
-            cur = cur.next;
+    /**
+     * @param position to check position
+     * @param low low index
+     * @param high high index
+     * @throws IndexOutOfBoundsException if {@code position} not in range
+     * {@code low} to {@code high}
+     */
+    public void checkBounds(int position, int low, int high) {
+        if (position > high || position < low) {
+            throw new IndexOutOfBoundsException(position + "");
         }
-        return joiner.toString();
     }
 
     /**
@@ -297,7 +403,7 @@ public class SinglyLinkedList {
         SinglyLinkedList list = new SinglyLinkedList();
         assert list.isEmpty();
         assert list.size() == 0 && list.count() == 0;
-        assert list.toString().equals("");
+        assert list.toString().isEmpty();
 
         /* Test insert function */
         list.insertHead(5);
@@ -306,7 +412,7 @@ public class SinglyLinkedList {
         list.insert(3);
         list.insertNth(1, 4);
         assert list.toString().equals("10->7->5->3->1");
-
+        System.out.println(list);
         /* Test search function */
         assert list.search(10) && list.search(5) && list.search(1) && !list.search(100);
 
@@ -318,7 +424,7 @@ public class SinglyLinkedList {
         list.deleteNth(1);
         list.delete();
         assert list.toString().equals("7->3");
-
+        System.out.println(list);
         assert list.size == 2 && list.size() == list.count();
 
         list.clear();
@@ -332,45 +438,39 @@ public class SinglyLinkedList {
             assert true;
             /* this should happen */
         }
-    }
-}
 
-/**
- * This class is the nodes of the SinglyLinked List. They consist of a value and
- * a pointer to the node after them.
- */
-class Node {
-
-    /**
-     * The value of the node
-     */
-    int value;
-
-    /**
-     * Point to the next node
-     */
-    Node next;
-
-    Node() {
+        SinglyLinkedList instance = new SinglyLinkedList();
+        SinglyLinkedListNode head = new SinglyLinkedListNode(0, new SinglyLinkedListNode(2, new SinglyLinkedListNode(3, new SinglyLinkedListNode(3, new SinglyLinkedListNode(4)))));
+        instance.setHead(head);
+        instance.deleteDuplicates();
+        instance.print();
     }
 
-    /**
-     * Constructor
-     *
-     * @param value Value to be put in the node
-     */
-    Node(int value) {
-        this(value, null);
+    @Override
+    public Iterator<Integer> iterator() {
+        return new SinglyLinkedListIterator();
     }
 
-    /**
-     * Constructor
-     *
-     * @param value Value to be put in the node
-     * @param next Reference to the next node
-     */
-    Node(int value, Node next) {
-        this.value = value;
-        this.next = next;
+    private class SinglyLinkedListIterator implements Iterator<Integer> {
+        private SinglyLinkedListNode current;
+
+        SinglyLinkedListIterator() {
+            current = head;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return current != null;
+        }
+
+        @Override
+        public Integer next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            final var value = current.value;
+            current = current.next;
+            return value;
+        }
     }
 }

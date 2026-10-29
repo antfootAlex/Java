@@ -1,82 +1,58 @@
 package com.thealgorithms.searches;
 
-import static java.lang.String.format;
-
-import java.util.Arrays;
-import java.util.Random;
-import java.util.stream.Stream;
 import com.thealgorithms.devutils.searches.SearchAlgorithm;
 
 /**
- * Binary search is one of the most popular algorithms This class represents
- * iterative version {@link BinarySearch} Iterative binary search is likely to
- * have lower constant factors because it doesn't involve the overhead of
- * manipulating the call stack. But in java the recursive version can be
- * optimized by the compiler to this version.
+ * Binary search is one of the most popular algorithms.
+ * This class represents the iterative version of {@link BinarySearch}.
  *
- * <p>
- * Worst-case performance O(log n) Best-case performance O(1) Average
- * performance O(log n) Worst-case space complexity O(1)
+ * <p>Iterative binary search avoids recursion overhead and uses constant space.
  *
- * @author Gabriele La Greca : https://github.com/thegabriele97
- * @author Podshivalov Nikita (https://github.com/nikitap492)
+ * <p>Performance:
+ * <ul>
+ *   <li>Best-case: O(1)</li>
+ *   <li>Average-case: O(log n)</li>
+ *   <li>Worst-case: O(log n)</li>
+ *   <li>Space complexity: O(1)</li>
+ * </ul>
+ *
+ * @author Gabriele La Greca
+ * @author Podshivalov Nikita
  * @see SearchAlgorithm
  * @see BinarySearch
  */
 public final class IterativeBinarySearch implements SearchAlgorithm {
 
     /**
-     * This method implements an iterative version of binary search algorithm
+     * Performs iterative binary search on a sorted array.
      *
-     * @param array a sorted array
-     * @param key the key to search in array
-     * @return the index of key in the array or -1 if not found
+     * @param array the sorted array
+     * @param key the element to search
+     * @param <T> type of elements (must be Comparable)
+     * @return index of the key if found, otherwise -1
      */
     @Override
     public <T extends Comparable<T>> int find(T[] array, T key) {
-        int l, r, k, cmp;
+        if (array == null || array.length == 0 || key == null) {
+            return -1;
+        }
 
-        l = 0;
-        r = array.length - 1;
+        int left = 0;
+        int right = array.length - 1;
 
-        while (l <= r) {
-            k = (l + r) >>> 1;
-            cmp = key.compareTo(array[k]);
+        while (left <= right) {
+            int mid = (left + right) >>> 1;
+            int cmp = key.compareTo(array[mid]);
 
             if (cmp == 0) {
-                return k;
+                return mid;
             } else if (cmp < 0) {
-                r = --k;
+                right = mid - 1;
             } else {
-                l = ++k;
+                left = mid + 1;
             }
         }
 
         return -1;
-    }
-
-    // Only a main method for test purpose
-    public static void main(String[] args) {
-        Random r = new Random();
-        int size = 100;
-        int maxElement = 100000;
-        Integer[] integers
-                = Stream.generate(() -> r.nextInt(maxElement)).limit(size).sorted().toArray(Integer[]::new);
-
-        // the element that should be found
-        Integer shouldBeFound = integers[r.nextInt(size - 1)];
-
-        IterativeBinarySearch search = new IterativeBinarySearch();
-        int atIndex = search.find(integers, shouldBeFound);
-
-        System.out.println(
-                String.format(
-                        "Should be found: %d. Found %d at index %d. An array length %d",
-                        shouldBeFound, integers[atIndex], atIndex, size));
-
-        int toCheck = Arrays.binarySearch(integers, shouldBeFound);
-        System.out.println(
-                format(
-                        "Found by system method at an index: %d. Is equal: %b", toCheck, toCheck == atIndex));
     }
 }

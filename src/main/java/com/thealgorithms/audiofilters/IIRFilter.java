@@ -4,7 +4,7 @@ package com.thealgorithms.audiofilters;
  * N-Order IIR Filter Assumes inputs are normalized to [-1, 1]
  *
  * Based on the difference equation from
- * https://en.wikipedia.org/wiki/Infinite_impulse_response
+ * <a href="https://en.wikipedia.org/wiki/Infinite_impulse_response">Wikipedia link</a>
  */
 public class IIRFilter {
 
@@ -58,7 +58,7 @@ public class IIRFilter {
             throw new IllegalArgumentException("bCoeffs must be of size " + order + ", got " + bCoeffs.length);
         }
 
-        for (int i = 0; i <= order; i++) {
+        for (int i = 0; i < order; i++) {
             coeffsA[i] = aCoeffs[i];
             coeffsB[i] = bCoeffs[i];
         }

@@ -1,28 +1,19 @@
 package com.thealgorithms.maths;
 
-public class Factorial {
+import java.math.BigInteger;
 
-    /* Driver Code */
-    public static void main(String[] args) {
-        assert factorial(0) == 1;
-        assert factorial(1) == 1;
-        assert factorial(5) == 120;
-        assert factorial(10) == 3628800;
+public final class Factorial {
+    private Factorial() {
     }
 
-    /**
-     * Calculate factorial N using iteration
-     *
-     * @param n the number
-     * @return the factorial of {@code n}
-     */
-    public static long factorial(int n) {
+    public static BigInteger factorial(int n) {
         if (n < 0) {
-            throw new IllegalArgumentException("number is negative");
+            throw new IllegalArgumentException("Input number cannot be negative");
         }
-        long factorial = 1;
-        for (int i = 1; i <= n; factorial *= i, ++i)
-      ;
-        return factorial;
+        BigInteger result = BigInteger.ONE;
+        for (int i = 1; i <= n; i++) {
+            result = result.multiply(BigInteger.valueOf(i));
+        }
+        return result;
     }
 }

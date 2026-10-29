@@ -1,31 +1,55 @@
 package com.thealgorithms.strings;
 
-/**
- * Alphabetical order is a system whereby character strings are placed in order
- * based on the position of the characters in the conventional ordering of an
- * alphabet. Wikipedia: https://en.wikipedia.org/wiki/Alphabetical_order
- */
-class Alphabetical {
+import java.util.Locale;
 
-    public static void main(String[] args) {
-        assert !isAlphabetical("123abc");
-        assert isAlphabetical("aBC");
-        assert isAlphabetical("abc");
-        assert !isAlphabetical("xyzabc");
-        assert isAlphabetical("abcxyz");
+/**
+ * Utility class for checking whether a string's characters are in non-decreasing
+ * lexicographical order based on Unicode code points (case-insensitive).
+ * <p>
+ * This does NOT implement language-aware alphabetical ordering (collation rules).
+ * It simply compares lowercase Unicode character values.
+ * <p>
+ * Non-letter characters are not allowed and will cause the check to fail.
+ * <p>
+ * Reference:
+ * <a href="https://en.wikipedia.org/wiki/Alphabetical_order">Wikipedia: Alphabetical order</a>
+ */
+public final class Alphabetical {
+
+    private Alphabetical() {
     }
 
     /**
-     * Check if a string is alphabetical order or not
+     * Checks whether the characters in the given string are in non-decreasing
+     * lexicographical order (case-insensitive).
+     * <p>
+     * Rules:
+     * <ul>
+     *   <li>String must not be null or blank</li>
+     *   <li>All characters must be letters</li>
+     *   <li>Comparison is based on lowercase Unicode values</li>
+     *   <li>Order must be non-decreasing (equal or increasing allowed)</li>
+     * </ul>
      *
-     * @param s a string
-     * @return {@code true} if given string is alphabetical order, otherwise
-     * {@code false}
+     * @param s input string
+     * @return {@code true} if characters are in non-decreasing order, otherwise {@code false}
      */
     public static boolean isAlphabetical(String s) {
-        s = s.toLowerCase();
-        for (int i = 0; i < s.length() - 1; ++i) {
-            if (!Character.isLetter(s.charAt(i)) || !(s.charAt(i) <= s.charAt(i + 1))) {
+        if (s == null || s.isBlank()) {
+            return false;
+        }
+
+        String normalized = s.toLowerCase(Locale.ROOT);
+
+        if (!Character.isLetter(normalized.charAt(0))) {
+            return false;
+        }
+
+        for (int i = 1; i < normalized.length(); i++) {
+            char prev = normalized.charAt(i - 1);
+            char curr = normalized.charAt(i);
+
+            if (!Character.isLetter(curr) || prev > curr) {
                 return false;
             }
         }

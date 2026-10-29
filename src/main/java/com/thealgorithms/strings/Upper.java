@@ -1,6 +1,8 @@
 package com.thealgorithms.strings;
 
-public class Upper {
+public final class Upper {
+    private Upper() {
+    }
 
     /**
      * Driver Code
@@ -13,18 +15,29 @@ public class Upper {
     }
 
     /**
-     * Converts all of the characters in this {@code String} to upper case
+     * Converts all the characters in this {@code String} to upper case.
      *
      * @param s the string to convert
      * @return the {@code String}, converted to uppercase.
      */
     public static String toUpperCase(String s) {
-        char[] values = s.toCharArray();
-        for (int i = 0; i < values.length; ++i) {
-            if (Character.isLetter(values[i]) && Character.isLowerCase(values[i])) {
-                values[i] = Character.toUpperCase(values[i]);
+        if (s == null) {
+            throw new IllegalArgumentException("Input string cannot be null");
+        }
+        if (s.isEmpty()) {
+            return s;
+        }
+
+        StringBuilder result = new StringBuilder(s.length());
+
+        for (int i = 0; i < s.length(); ++i) {
+            char currentChar = s.charAt(i);
+            if (Character.isLowerCase(currentChar)) {
+                result.append(Character.toUpperCase(currentChar));
+            } else {
+                result.append(currentChar);
             }
         }
-        return new String(values);
+        return result.toString();
     }
 }

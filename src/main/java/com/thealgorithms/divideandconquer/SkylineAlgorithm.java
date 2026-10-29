@@ -45,7 +45,6 @@ public class SkylineAlgorithm {
      * @see Point
      */
     public ArrayList<Point> produceSubSkyLines(ArrayList<Point> list) {
-
         // part where function exits flashback
         int size = list.size();
         if (size == 1) {
@@ -94,7 +93,6 @@ public class SkylineAlgorithm {
      * @return left the final skyline
      */
     public ArrayList<Point> produceFinalSkyLine(ArrayList<Point> left, ArrayList<Point> right) {
-
         // dominated points of ArrayList left are removed
         for (int i = 0; i < left.size() - 1; i++) {
             if (left.get(i).x == left.get(i + 1).x && left.get(i).y > left.get(i + 1).y) {
@@ -163,12 +161,12 @@ public class SkylineAlgorithm {
          * function dominates the argument point.
          *
          * @param p1 the point that is compared
-         * @return true if the point wich calls the function dominates p1 false
+         * @return true if the point which calls the function dominates p1 false
          * otherwise.
          */
         public boolean dominates(Point p1) {
             // checks if p1 is dominated
-            return (this.x < p1.x && this.y <= p1.y) || (this.x <= p1.x && this.y < p1.y);
+            return ((this.x < p1.x && this.y <= p1.y) || (this.x <= p1.x && this.y < p1.y));
         }
     }
 

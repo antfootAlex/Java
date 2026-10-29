@@ -1,80 +1,71 @@
 package com.thealgorithms.searches;
 
-import com.thealgorithms.searches.DepthFirstSearch.Node;
-
+import com.thealgorithms.datastructures.Node;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.Queue;
+import java.util.Set;
 
 /**
- * @author: caos321
- * @date: 31 October 2021 (Sunday)
+ * Breadth-First Search implementation for tree/graph traversal.
+ * @author caos321
+ * @co-author @manishraj27
+ * @see <a href="https://en.wikipedia.org/wiki/Breadth-first_search">Breadth-first search</a>
  */
-public class BreadthFirstSearch {
+public class BreadthFirstSearch<T> {
+    private final List<T> visited = new ArrayList<>();
+    private final Set<T> visitedSet = new HashSet<>();
 
-    public static Optional<Node> search(final Node node, final String name) {
-        if (node.getName().equals(name)) {
-            return Optional.of(node);
+    /**
+     * Performs a breadth-first search to find a node with the given value.
+     *
+     * @param root The root node to start the search from
+     * @param value The value to search for
+     * @return Optional containing the found node, or empty if not found
+     */
+    public Optional<Node<T>> search(final Node<T> root, final T value) {
+        if (root == null) {
+            return Optional.empty();
         }
 
-        List<Node> queue = new ArrayList<>(node.getSubNodes());
+        visited.add(root.getValue());
+        visitedSet.add(root.getValue());
 
+        if (root.getValue() == value) {
+            return Optional.of(root);
+        }
+
+        Queue<Node<T>> queue = new ArrayDeque<>(root.getChildren());
         while (!queue.isEmpty()) {
-            final Node current = queue.get(0);
+            final Node<T> current = queue.poll();
+            T currentValue = current.getValue();
 
-            if (current.getName().equals(name)) {
+            if (visitedSet.contains(currentValue)) {
+                continue;
+            }
+
+            visited.add(currentValue);
+            visitedSet.add(currentValue);
+
+            if (currentValue == value || (value != null && value.equals(currentValue))) {
                 return Optional.of(current);
             }
 
-            queue.addAll(current.getSubNodes());
-
-            queue.remove(0);
+            queue.addAll(current.getChildren());
         }
 
         return Optional.empty();
     }
 
-    public static void assertThat(final Object actual, final Object expected) {
-        if (!Objects.equals(actual, expected)) {
-            throw new AssertionError(String.format("expected=%s but was actual=%s", expected, actual));
-        }
-    }
-
-    public static void main(final String[] args) {
-        final Node rootNode = new Node("A", List.of(
-                new Node("B", List.of(new Node("D"), new Node("F", List.of(
-                        new Node("H"), new Node("I")
-                )))),
-                new Node("C", List.of(new Node("G"))),
-                new Node("E")
-        ));
-
-        {
-            final String expected = "I";
-
-            final Node result = search(rootNode, expected)
-                    .orElseThrow(() -> new AssertionError("Node not found!"));
-
-            assertThat(result.getName(), expected);
-        }
-
-        {
-            final String expected = "G";
-
-            final Node result = search(rootNode, expected)
-                    .orElseThrow(() -> new AssertionError("Node not found!"));
-
-            assertThat(result.getName(), expected);
-        }
-
-        {
-            final String expected = "E";
-
-            final Node result = search(rootNode, expected)
-                    .orElseThrow(() -> new AssertionError("Node not found!"));
-
-            assertThat(result.getName(), expected);
-        }
+    /**
+     * Returns the list of nodes in the order they were visited.
+     *
+     * @return List containing the visited nodes
+     */
+    public List<T> getVisited() {
+        return visited;
     }
 }

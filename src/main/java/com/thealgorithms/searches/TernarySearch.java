@@ -1,45 +1,46 @@
 package com.thealgorithms.searches;
 
-import static java.lang.String.format;
-
-import java.util.Arrays;
-import java.util.Random;
-import java.util.stream.Stream;
 import com.thealgorithms.devutils.searches.SearchAlgorithm;
 
 /**
- * A ternary search algorithm is a technique in computer science for finding the
- * minimum or maximum of a unimodal function The algorithm determines either
- * that the minimum or maximum cannot be in the first third of the domain or
- * that it cannot be in the last third of the domain, then repeats on the
- * remaining third.
+ * A ternary search algorithm is a divide-and-conquer algorithm that searches for
+ * a key in a sorted array by dividing the search domain into three parts.
  *
  * <p>
- * Worst-case performance Θ(log3(N)) Best-case performance O(1) Average
- * performance Θ(log3(N)) Worst-case space complexity O(1)
+ * Worst-case performance: Θ(log3(N))<br>
+ * Best-case performance: O(1)<br>
+ * Average performance: Θ(log3(N))<br>
+ * Worst-case space complexity: O(log3(N))
  *
  * @author Podshivalov Nikita (https://github.com/nikitap492)
  * @see SearchAlgorithm
  * @see IterativeBinarySearch
  */
-public class TernarySearch implements SearchAlgorithm {
+public final class TernarySearch implements SearchAlgorithm {
 
     /**
-     * @param arr The **Sorted** array in which we will search the element.
+     * Searches for a value in a sorted array using ternary search.
+     *
+     * @param arr The sorted array in which we will search for the element.
      * @param value The value that we want to search for.
-     * @return The index of the element if found. Else returns -1.
+     * @return The index of the element if found. Returns -1 if the array is null or empty, if value is null, or if not found.
      */
     @Override
     public <T extends Comparable<T>> int find(T[] arr, T value) {
+        if (arr == null || arr.length == 0 || value == null) {
+            return -1;
+        }
         return ternarySearch(arr, value, 0, arr.length - 1);
     }
 
     /**
-     * @param arr The **Sorted** array in which we will search the element.
+     * Recursively searches for the specified key within the range [start, end].
+     *
+     * @param arr The sorted array in which we will search the element.
      * @param key The value that we want to search for.
-     * @param start The starting index from which we will start Searching.
-     * @param end The ending index till which we will Search.
-     * @return Returns the index of the Element if found. Else returns -1.
+     * @param start The starting index from which we will start searching.
+     * @param end The ending index till which we will search.
+     * @return Returns the index of the element if found. Else returns -1.
      */
     private <T extends Comparable<T>> int ternarySearch(T[] arr, T key, int start, int end) {
         if (start > end) {
@@ -50,41 +51,22 @@ public class TernarySearch implements SearchAlgorithm {
         /* Second boundary: add 2/3 of length to start */
         int mid2 = start + 2 * (end - start) / 3;
 
-        if (key.compareTo(arr[mid1]) == 0) {
+        int cmp1 = key.compareTo(arr[mid1]);
+        if (cmp1 == 0) {
             return mid1;
-        } else if (key.compareTo(arr[mid2]) == 0) {
-            return mid2;
-        } /* Search the first (1/3) rd part of the array.*/ else if (key.compareTo(arr[mid1]) < 0) {
-            return ternarySearch(arr, key, start, --mid1);
-        } /* Search 3rd (1/3)rd part of the array */ else if (key.compareTo(arr[mid2]) > 0) {
-            return ternarySearch(arr, key, ++mid2, end);
-        } /* Search middle (1/3)rd part of the array */ else {
-            return ternarySearch(arr, key, mid1, mid2);
         }
-    }
 
-    public static void main(String[] args) {
-        // just generate data
-        Random r = new Random();
-        int size = 100;
-        int maxElement = 100000;
-        Integer[] integers
-                = Stream.generate(() -> r.nextInt(maxElement)).limit(size).sorted().toArray(Integer[]::new);
+        int cmp2 = key.compareTo(arr[mid2]);
+        if (cmp2 == 0) {
+            return mid2;
+        }
 
-        // the element that should be found
-        Integer shouldBeFound = integers[r.nextInt(size - 1)];
-
-        TernarySearch search = new TernarySearch();
-        int atIndex = search.find(integers, shouldBeFound);
-
-        System.out.println(
-                format(
-                        "Should be found: %d. Found %d at index %d. An array length %d",
-                        shouldBeFound, integers[atIndex], atIndex, size));
-
-        int toCheck = Arrays.binarySearch(integers, shouldBeFound);
-        System.out.println(
-                format(
-                        "Found by system method at an index: %d. Is equal: %b", toCheck, toCheck == atIndex));
+        if (cmp1 < 0) {
+            return ternarySearch(arr, key, start, mid1 - 1);
+        } else if (cmp2 > 0) {
+            return ternarySearch(arr, key, mid2 + 1, end);
+        } else {
+            return ternarySearch(arr, key, mid1 + 1, mid2 - 1);
+        }
     }
 }

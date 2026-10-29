@@ -19,7 +19,6 @@ package com.thealgorithms.datastructures.heaps;
  * @author Nicolas Renard
  */
 public interface Heap {
-
     /**
      * @return the top element in the heap, the one with lowest key for min-heap
      * or with the highest key for max-heap
@@ -41,5 +40,5 @@ public interface Heap {
      * @param elementIndex int containing the position in the heap of the
      * element to be deleted.
      */
-    void deleteElement(int elementIndex);
+    void deleteElement(int elementIndex) throws EmptyHeapException;
 }

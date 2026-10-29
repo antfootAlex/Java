@@ -1,31 +1,34 @@
 package com.thealgorithms.maths;
 
-import java.util.Random;
+/**
+ * Utility class to compute the ceiling of a given number.
+ */
+public final class Ceil {
 
-public class Ceil {
-
-    public static void main(String[] args) {
-        Random random = new Random();
-        for (int i = 1; i <= 1000; ++i) {
-            double randomNumber = random.nextDouble();
-            assert ceil(randomNumber) == Math.ceil(randomNumber);
-        }
+    private Ceil() {
     }
 
     /**
-     * Returns the smallest (closest to negative infinity)
+     * Returns the smallest double value that is greater than or equal to the input.
+     * Equivalent to mathematical ⌈x⌉ (ceiling function).
      *
-     * @param number the number
-     * @return the smallest (closest to negative infinity) of given
-     * {@code number}
+     * @param number the number to ceil
+     * @return the smallest double greater than or equal to {@code number}
      */
     public static double ceil(double number) {
-        if (number - (int) number == 0) {
+        if (Double.isNaN(number) || Double.isInfinite(number) || number == 0.0 || number < Integer.MIN_VALUE || number > Integer.MAX_VALUE) {
             return number;
-        } else if (number - (int) number > 0) {
-            return (int) (number + 1);
+        }
+
+        if (number < 0.0 && number > -1.0) {
+            return -0.0;
+        }
+
+        long intPart = (long) number;
+        if (number > 0 && number != intPart) {
+            return intPart + 1.0;
         } else {
-            return (int) number;
+            return intPart;
         }
     }
 }

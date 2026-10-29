@@ -7,6 +7,7 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * @author dimgrichr
  */
+@SuppressWarnings("unchecked")
 public class CRCAlgorithm {
 
     private int correctMess;
@@ -25,8 +26,6 @@ public class CRCAlgorithm {
 
     private ArrayList<Integer> message;
 
-    private ArrayList<Integer> dividedMessage;
-
     private ArrayList<Integer> p;
 
     private Random randomGenerator;
@@ -44,7 +43,6 @@ public class CRCAlgorithm {
         messageChanged = false;
         message = new ArrayList<>();
         messSize = size;
-        dividedMessage = new ArrayList<>();
         p = new ArrayList<>();
         for (int i = 0; i < str.length(); i++) {
             p.add(Character.getNumericValue(str.charAt(i)));
@@ -97,13 +95,12 @@ public class CRCAlgorithm {
 
     /**
      * Resets some of the object's values, used on the main function, so that it
-     * can be re-used, in order not to waste too much memory and time, by
+     * can be reused, in order not to waste too much memory and time, by
      * creating new objects.
      */
     public void refactor() {
         messageChanged = false;
         message = new ArrayList<>();
-        dividedMessage = new ArrayList<>();
     }
 
     /**
@@ -156,11 +153,9 @@ public class CRCAlgorithm {
                 }
             }
         }
-        dividedMessage = (ArrayList<Integer>) x.clone();
+        ArrayList<Integer> dividedMessage = (ArrayList<Integer>) x.clone();
         if (!check) {
-            for (int z : dividedMessage) {
-                message.add(z);
-            }
+            message.addAll(dividedMessage);
         } else {
             if (dividedMessage.contains(1) && messageChanged) {
                 wrongMessCaught++;
@@ -176,7 +171,7 @@ public class CRCAlgorithm {
      * Once the message is transmitted, some of it's elements, is possible to
      * change from 1 to 0, or from 0 to 1, because of the Bit Error Rate (ber).
      * For every element of the message, a random double number is created. If
-     * that number is smaller than ber, then the spesific element changes. On
+     * that number is smaller than ber, then the specific element changes. On
      * the other hand, if it's bigger than ber, it does not. Based on these
      * changes. the boolean variable messageChanged, gets the value: true, or
      * false.

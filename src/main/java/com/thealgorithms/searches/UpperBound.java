@@ -1,10 +1,5 @@
 package com.thealgorithms.searches;
 
-import static java.lang.String.format;
-
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.IntStream;
 import com.thealgorithms.devutils.searches.SearchAlgorithm;
 
 /**
@@ -18,7 +13,7 @@ import com.thealgorithms.devutils.searches.SearchAlgorithm;
  * This is an extension of BinarySearch.
  *
  * <p>
- * Worst-case performance O(log n) Best-case performance O(1) Average
+ * Worst-case performance O(log n) Best-case performance O(log n) Average
  * performance O(log n) Worst-case space complexity O(1)
  *
  * @author Pratik Padalia (https://github.com/15pratik)
@@ -27,46 +22,17 @@ import com.thealgorithms.devutils.searches.SearchAlgorithm;
  */
 class UpperBound implements SearchAlgorithm {
 
-    // Driver Program
-    public static void main(String[] args) {
-        // Just generate data
-        Random r = ThreadLocalRandom.current();
-
-        int size = 100;
-        int maxElement = 100000;
-
-        Integer[] integers
-                = IntStream.generate(() -> r.nextInt(maxElement))
-                        .limit(size)
-                        .sorted()
-                        .boxed()
-                        .toArray(Integer[]::new);
-
-        // The element for which the upper bound is to be found
-        int val = integers[r.nextInt(size - 1)] + 1;
-
-        UpperBound search = new UpperBound();
-        int atIndex = search.find(integers, val);
-
-        System.out.println(
-                format(
-                        "Val: %d. Upper Bound Found %d at index %d. An array length %d",
-                        val, integers[atIndex], atIndex, size));
-
-        boolean toCheck = integers[atIndex] > val || integers[size - 1] < val;
-        System.out.println(
-                format(
-                        "Upper Bound found at an index: %d. Is greater or max element: %b", atIndex, toCheck));
-    }
-
     /**
      * @param array is an array where the UpperBound value is to be found
      * @param key is an element for which the UpperBound is to be found
      * @param <T> is any comparable type
-     * @return index of the UpperBound element
+     * @return index of the first element greater than key, last index if no such element exists, or 0 if array is null/empty or key is null
      */
     @Override
     public <T extends Comparable<T>> int find(T[] array, T key) {
+        if (array == null || array.length == 0 || key == null) {
+            return 0;
+        }
         return search(array, key, 0, array.length - 1);
     }
 

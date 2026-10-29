@@ -1,25 +1,27 @@
 package com.thealgorithms.backtracking;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Problem statement: Given a N x N chess board. Return all arrangements in
  * which N queens can be placed on the board such no two queens attack each
  * other. Ex. N = 6 Solution= There are 4 possible ways Arrangement: 1 ".Q....",
  * "...Q..", ".....Q", "Q.....", "..Q...", "....Q."
- * <p>
+ *
  * Arrangement: 2 "..Q...", ".....Q", ".Q....", "....Q.", "Q.....", "...Q.."
- * <p>
+ *
  * Arrangement: 3 "...Q..", "Q.....", "....Q.", ".Q....", ".....Q", "..Q..."
- * <p>
+ *
  * Arrangement: 4 "....Q.", "..Q...", "Q.....", ".....Q", "...Q..", ".Q...."
  *
  * Solution: Brute Force approach:
  *
  * Generate all possible arrangement to place N queens on N*N board. Check each
  * board if queens are placed safely. If it is safe, include arrangement in
- * solution set. Otherwise ignore it
+ * solution set. Otherwise, ignore it
  *
  * Optimized solution: This can be solved using backtracking in below steps
  *
@@ -32,43 +34,57 @@ import java.util.List;
  * queen is not placed safely. If there is no such way then return an empty list
  * as solution
  */
-public class NQueens {
 
-    public static void main(String[] args) {
-        placeQueens(1);
-        placeQueens(2);
-        placeQueens(3);
-        placeQueens(4);
-        placeQueens(5);
-        placeQueens(6);
+/*
+ * Time Complexity: O(N!)
+ * space Complexity: O(N)
+ */
+public final class NQueens {
+
+    // Store occupied rows for constant time safety check
+    private static final Set<Integer> OCROWS = new HashSet<>();
+
+    // Store occupied main diagonals (row - column)
+    private static final Set<Integer> OCDIAG = new HashSet<>();
+
+    // Store occupied anti-diagonals (row + columns)
+    private static final Set<Integer> OCANTIDIAG = new HashSet<>();
+
+    private NQueens() {
+    }
+
+    public static List<List<String>> getNQueensArrangements(int queens) {
+        List<List<String>> arrangements = new ArrayList<>();
+        getSolution(queens, arrangements, new int[queens], 0);
+        return arrangements;
     }
 
     public static void placeQueens(final int queens) {
-        List<List<String>> arrangements = new ArrayList<List<String>>();
+        List<List<String>> arrangements = new ArrayList<>();
         getSolution(queens, arrangements, new int[queens], 0);
         if (arrangements.isEmpty()) {
-            System.out.println("There is no way to place " + queens + " queens on board of size " + queens + "x" + queens);
+            System.out.println(" no way to place " + queens + " queens on board of size " + queens + "x" + queens);
         } else {
             System.out.println("Arrangement for placing " + queens + " queens");
         }
-        arrangements.forEach(arrangement -> {
-            arrangement.forEach(row -> System.out.println(row));
+        for (List<String> arrangement : arrangements) {
+            arrangement.forEach(System.out::println);
             System.out.println();
-        });
+        }
     }
 
     /**
      * This is backtracking function which tries to place queen recursively
      *
-     * @param boardSize: size of chess board
-     * @param solutions: this holds all possible arrangements
-     * @param columns: columns[i] = rowId where queen is placed in ith column.
+     * @param boardSize:   size of chess board
+     * @param solutions:   this holds all possible arrangements
+     * @param columns:     columns[i] = rowId where queen is placed in ith column.
      * @param columnIndex: This is the column in which queen is being placed
      */
     private static void getSolution(int boardSize, List<List<String>> solutions, int[] columns, int columnIndex) {
         if (columnIndex == boardSize) {
             // this means that all queens have been placed
-            List<String> sol = new ArrayList<String>();
+            List<String> sol = new ArrayList<>();
             for (int i = 0; i < boardSize; i++) {
                 StringBuilder sb = new StringBuilder();
                 for (int j = 0; j < boardSize; j++) {
@@ -83,29 +99,29 @@ public class NQueens {
         // This loop tries to place queen in a row one by one
         for (int rowIndex = 0; rowIndex < boardSize; rowIndex++) {
             columns[columnIndex] = rowIndex;
-            if (isPlacedCorrectly(columns, rowIndex, columnIndex)) {
-                // If queen is placed successfully at rowIndex in column=columnIndex then try placing queen in next column
-                getSolution(boardSize, solutions, columns, columnIndex + 1);
-            }
-        }
-    }
 
-    /**
-     * This function checks if queen can be placed at row = rowIndex in column =
-     * columnIndex safely
-     *
-     * @param columns: columns[i] = rowId where queen is placed in ith column.
-     * @param rowIndex: row in which queen has to be placed
-     * @param columnIndex: column in which queen is being placed
-     * @return true: if queen can be placed safely false: otherwise
-     */
-    private static boolean isPlacedCorrectly(int[] columns, int rowIndex, int columnIndex) {
-        for (int i = 0; i < columnIndex; i++) {
-            int diff = Math.abs(columns[i] - rowIndex);
-            if (diff == 0 || columnIndex - i == diff) {
-                return false;
+            // Skip current position if row or diagonal is already occupied
+            boolean isROp = OCROWS.contains(rowIndex);
+
+            boolean isDOp = OCDIAG.contains(rowIndex - columnIndex) || OCANTIDIAG.contains(rowIndex + columnIndex);
+
+            if (isROp || isDOp) {
+                continue;
             }
+
+            // Mark current row and diagonal as occupied
+            OCROWS.add(rowIndex);
+            OCDIAG.add(rowIndex - columnIndex);
+            OCANTIDIAG.add(rowIndex + columnIndex);
+
+            // Move to the next column after placing current queen
+            getSolution(boardSize, solutions, columns, columnIndex + 1);
+
+            // Backtrack by removing current queen
+
+            OCROWS.remove(rowIndex);
+            OCDIAG.remove(rowIndex - columnIndex);
+            OCANTIDIAG.remove(rowIndex + columnIndex);
         }
-        return true;
     }
 }

@@ -1,133 +1,133 @@
 package com.thealgorithms.datastructures.buffers;
 
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class CircularBuffer {
+/**
+ * The {@code CircularBuffer} class implements a generic circular (or ring) buffer.
+ * A circular buffer is a fixed-size data structure that operates in a FIFO (First In, First Out) manner.
+ * The buffer allows you to overwrite old data when the buffer is full and efficiently use limited memory.
+ * When the buffer is full, adding a new item will overwrite the oldest data.
+ *
+ * @param <Item> The type of elements stored in the circular buffer.
+ */
+@SuppressWarnings("unchecked")
+public class CircularBuffer<Item> {
+    private final Item[] buffer;
+    private final CircularPointer putPointer;
+    private final CircularPointer getPointer;
+    private final AtomicInteger size = new AtomicInteger(0);
 
-    private char[] _buffer;
-    public final int _buffer_size;
-    private int _write_index = 0;
-    private int _read_index = 0;
-    private AtomicInteger _readable_data = new AtomicInteger(0);
-
-    public CircularBuffer(int buffer_size) {
-        if (!IsPowerOfTwo(buffer_size)) {
-            throw new IllegalArgumentException();
+    /**
+     * Constructor to initialize the circular buffer with a specified size.
+     *
+     * @param size The size of the circular buffer.
+     * @throws IllegalArgumentException if the size is zero or negative.
+     */
+    public CircularBuffer(int size) {
+        if (size <= 0) {
+            throw new IllegalArgumentException("Buffer size must be positive");
         }
-        this._buffer_size = buffer_size;
-        _buffer = new char[buffer_size];
+        // noinspection unchecked
+        this.buffer = (Item[]) new Object[size];
+        this.putPointer = new CircularPointer(0, size);
+        this.getPointer = new CircularPointer(0, size);
     }
 
-    private boolean IsPowerOfTwo(int i) {
-        return (i & (i - 1)) == 0;
+    /**
+     * Checks if the circular buffer is empty.
+     * This method is based on the current size of the buffer.
+     *
+     * @return {@code true} if the buffer is empty, {@code false} otherwise.
+     */
+    public boolean isEmpty() {
+        return size.get() == 0;
     }
 
-    private int getTrueIndex(int i) {
-        return i % _buffer_size;
+    /**
+     * Checks if the circular buffer is full.
+     * The buffer is considered full when its size equals its capacity.
+     *
+     * @return {@code true} if the buffer is full, {@code false} otherwise.
+     */
+    public boolean isFull() {
+        return size.get() == buffer.length;
     }
 
-    public Character readOutChar() {
-        Character result = null;
-
-        // if we have data to read
-        if (_readable_data.get() > 0) {
-
-            result = Character.valueOf(_buffer[getTrueIndex(_read_index)]);
-            _readable_data.decrementAndGet();
-            _read_index++;
+    /**
+     * Retrieves and removes the item at the front of the buffer (FIFO).
+     * This operation will move the {@code getPointer} forward.
+     *
+     * @return The item at the front of the buffer, or {@code null} if the buffer is empty.
+     */
+    public Item get() {
+        if (isEmpty()) {
+            return null;
         }
 
-        return result;
+        Item item = buffer[getPointer.getAndIncrement()];
+        size.decrementAndGet();
+        return item;
     }
 
-    public boolean writeToCharBuffer(char c) {
-        boolean result = false;
-
-        // if we can write to the buffer
-        if (_readable_data.get() < _buffer_size) {
-            // write to buffer
-            _buffer[getTrueIndex(_write_index)] = c;
-            _readable_data.incrementAndGet();
-            _write_index++;
-            result = true;
+    /**
+     * Adds an item to the end of the buffer (FIFO).
+     * If the buffer is full, this operation will overwrite the oldest data.
+     *
+     * @param item The item to be added.
+     * @throws IllegalArgumentException if the item is null.
+     * @return {@code true} if the item was successfully added, {@code false} if the buffer was full and the item overwrote existing data.
+     */
+    public boolean put(Item item) {
+        if (item == null) {
+            throw new IllegalArgumentException("Null items are not allowed");
         }
 
-        return result;
+        boolean wasEmpty = isEmpty();
+        if (isFull()) {
+            getPointer.getAndIncrement(); // Move get pointer to discard oldest item
+        } else {
+            size.incrementAndGet();
+        }
+
+        buffer[putPointer.getAndIncrement()] = item;
+        return wasEmpty;
     }
 
-    private static class TestWriteWorker implements Runnable {
+    /**
+     * The {@code CircularPointer} class is a helper class used to track the current index (pointer)
+     * in the circular buffer.
+     * The max value represents the capacity of the buffer.
+     * The `CircularPointer` class ensures that the pointer automatically wraps around to 0
+     * when it reaches the maximum index.
+     * This is achieved in the `getAndIncrement` method, where the pointer
+     * is incremented and then taken modulo the maximum value (`max`).
+     * This operation ensures that the pointer always stays within the bounds of the buffer.
+     */
+    private static class CircularPointer {
+        private int pointer;
+        private final int max;
 
-        String _alphabet = "abcdefghijklmnopqrstuvwxyz0123456789";
-        Random _random = new Random();
-        CircularBuffer _buffer;
-
-        public TestWriteWorker(CircularBuffer cb) {
-            this._buffer = cb;
+        /**
+         * Constructor to initialize the circular pointer.
+         *
+         * @param pointer The initial position of the pointer.
+         * @param max The maximum size (capacity) of the circular buffer.
+         */
+        CircularPointer(int pointer, int max) {
+            this.pointer = pointer;
+            this.max = max;
         }
 
-        private char getRandomChar() {
-            return _alphabet.charAt(_random.nextInt(_alphabet.length()));
+        /**
+         * Increments the pointer by 1 and wraps it around to 0 if it reaches the maximum value.
+         * This ensures the pointer always stays within the buffer's bounds.
+         *
+         * @return The current pointer value before incrementing.
+         */
+        public int getAndIncrement() {
+            int tmp = pointer;
+            pointer = (pointer + 1) % max;
+            return tmp;
         }
-
-        public void run() {
-            while (!Thread.interrupted()) {
-                if (!_buffer.writeToCharBuffer(getRandomChar())) {
-                    Thread.yield();
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        return;
-                    }
-                }
-            }
-        }
-    }
-
-    private static class TestReadWorker implements Runnable {
-
-        CircularBuffer _buffer;
-
-        public TestReadWorker(CircularBuffer cb) {
-            this._buffer = cb;
-        }
-
-        @Override
-        public void run() {
-            System.out.println("Printing Buffer:");
-            while (!Thread.interrupted()) {
-                Character c = _buffer.readOutChar();
-                if (c != null) {
-                    System.out.print(c.charValue());
-                } else {
-                    Thread.yield();
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        System.out.println();
-                        return;
-                    }
-                }
-            }
-        }
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        int buffer_size = 1024;
-        // create circular buffer
-        CircularBuffer cb = new CircularBuffer(buffer_size);
-
-        // create threads that read and write the buffer.
-        Thread write_thread = new Thread(new TestWriteWorker(cb));
-        Thread read_thread = new Thread(new TestReadWorker(cb));
-        read_thread.start();
-        write_thread.start();
-
-        // wait some amount of time
-        Thread.sleep(10000);
-
-        // interrupt threads and exit
-        write_thread.interrupt();
-        read_thread.interrupt();
     }
 }

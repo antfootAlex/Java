@@ -1,57 +1,80 @@
-// Wikipedia for Harshad Number : https://en.wikipedia.org/wiki/Harshad_number
 package com.thealgorithms.maths;
 
-import java.util.Scanner;
-
-public class HarshadNumber {
-
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Enter a number : ");
-        long a = sc.nextLong();
-
-        checkHarshadNumber(a);
+/**
+ * A Harshad number (or Niven number) in a given number base is an integer that
+ * is divisible by the sum of its digits.
+ * For example, 18 is a Harshad number because 18 is divisible by (1 + 8) = 9.
+ * The name "Harshad" comes from the Sanskrit words "harṣa" (joy) and "da"
+ * (give), meaning "joy-giver".
+ *
+ * @author <a href="https://github.com/Hardvan">Hardvan</a>
+ * @see <a href="https://en.wikipedia.org/wiki/Harshad_number">Harshad Number -
+ *      Wikipedia</a>
+ */
+public final class HarshadNumber {
+    private HarshadNumber() {
     }
 
     /**
-     * A function to check if a number is Harshad number or not
+     * Checks if a number is a Harshad number.
+     * A Harshad number is a positive integer that is divisible by the sum of its
+     * digits.
      *
-     * @param a The number which should be checked
+     * @param n the number to be checked (must be positive)
+     * @return {@code true} if {@code n} is a Harshad number, otherwise
+     *         {@code false}
+     * @throws IllegalArgumentException if {@code n} is less than or equal to 0
      */
-    public static void checkHarshadNumber(long a) {
-
-        long b = a;
-        int sum = 0;
-
-        // this is just for showing the explanation else it's of no use you can ommit it
-        int[] each = new int[Long.toString(a).length()];
-
-        int c = 0;
-
-        while (b > 0) {
-            sum += b % 10;
-            each[c] = (int) (b % 10);
-            b /= 10;
-            c++;
+    public static boolean isHarshad(long n) {
+        if (n <= 0) {
+            throw new IllegalArgumentException("Input must be a positive integer. Received: " + n);
         }
 
-        if (a % sum == 0) {
-            System.out.println(a + " is a Harshad Number");
+        long temp = n;
+        long sumOfDigits = 0;
+        while (temp > 0) {
+            sumOfDigits += temp % 10;
+            temp /= 10;
+        }
 
-            // For you better explanation how is that a Harshad Number
-            System.out.println("\nExplaination :");
+        return n % sumOfDigits == 0;
+    }
 
-            for (int i = each.length - 1; i >= 0; i--) {
-                System.out.print(each[i] + " ");
-                if (i != 0) {
-                    System.out.print("+ ");
-                }
+    /**
+     * Checks if a number represented as a string is a Harshad number.
+     * A Harshad number is a positive integer that is divisible by the sum of its
+     * digits.
+     *
+     * @param s the string representation of the number to be checked
+     * @return {@code true} if the number is a Harshad number, otherwise
+     *         {@code false}
+     * @throws IllegalArgumentException if {@code s} is null, empty, or represents a
+     *                                  non-positive integer
+     * @throws NumberFormatException    if {@code s} cannot be parsed as a long
+     */
+    public static boolean isHarshad(String s) {
+        if (s == null || s.isEmpty()) {
+            throw new IllegalArgumentException("Input string cannot be null or empty");
+        }
+
+        final long n;
+        try {
+            n = Long.parseLong(s);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Input string must be a valid integer: " + s, e);
+        }
+
+        if (n <= 0) {
+            throw new IllegalArgumentException("Input must be a positive integer. Received: " + n);
+        }
+
+        int sumOfDigits = 0;
+        for (char ch : s.toCharArray()) {
+            if (Character.isDigit(ch)) {
+                sumOfDigits += ch - '0';
             }
-
-            System.out.println("= " + sum);
-            System.out.println(sum + " × " + (a / sum) + " = " + a);
-        } else {
-            System.out.println(a + " is not a Harshad Number");
         }
+
+        return n % sumOfDigits == 0;
     }
 }

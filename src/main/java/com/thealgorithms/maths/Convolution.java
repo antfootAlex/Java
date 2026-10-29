@@ -6,38 +6,38 @@ package com.thealgorithms.maths;
  * @author Ioannis Karavitsis
  * @version 1.0
  */
-public class Convolution {
+public final class Convolution {
+    private Convolution() {
+    }
 
     /**
      * Discrete linear convolution function. Both input signals and the output
      * signal must start from 0. If you have a signal that has values before 0
      * then shift it to start from 0.
      *
-     * @param A The first discrete signal
-     * @param B The second discrete signal
+     * @param a The first discrete signal
+     * @param b The second discrete signal
      * @return The convolved signal
      */
-    public static double[] convolution(double[] A, double[] B) {
-        double[] convolved = new double[A.length + B.length - 1];
+    public static double[] convolution(double[] a, double[] b) {
+        double[] convolved = new double[a.length + b.length - 1];
 
         /*
-    The discrete convolution of two signals A and B is defined as:
-
-          A.length
-    C[i] = Σ (A[k]*B[i-k])
-          k=0
-
-    It's obvious that:  0 <= k <= A.length , 0 <= i <= A.length + B.length - 2  and  0 <= i-k <= B.length - 1
-    From the last inequality we get that:  i - B.length + 1 <= k <= i and thus we get the conditions below.
+         * Discrete convolution formula:
+         * C[i] = Σ A[k] * B[i - k]
+         * where k ranges over valid indices so that both A[k] and B[i-k] are in bounds.
          */
-        for (int i = 0; i < convolved.length; i++) {
-            convolved[i] = 0;
-            int k = Math.max(i - B.length + 1, 0);
 
-            while (k < i + 1 && k < A.length) {
-                convolved[i] += A[k] * B[i - k];
-                k++;
+        for (int i = 0; i < convolved.length; i++) {
+            double sum = 0;
+            int kStart = Math.max(0, i - b.length + 1);
+            int kEnd = Math.min(i, a.length - 1);
+
+            for (int k = kStart; k <= kEnd; k++) {
+                sum += a[k] * b[i - k];
             }
+
+            convolved[i] = sum;
         }
 
         return convolved;

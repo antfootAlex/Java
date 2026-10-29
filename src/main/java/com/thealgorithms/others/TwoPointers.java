@@ -1,55 +1,43 @@
 package com.thealgorithms.others;
 
-import java.util.Arrays;
-
 /**
- * The two pointer technique is a useful tool to utilize when searching for
+ * The two-pointer technique is a useful tool to utilize when searching for
  * pairs in a sorted array.
  *
  * <p>
- * link: https://www.geeksforgeeks.org/two-pointers-technique/
+ * Link: https://www.geeksforgeeks.org/two-pointers-technique/
  */
-class TwoPointers {
+public final class TwoPointers {
 
-    public static void main(String[] args) {
-        int[] arr = {10, 20, 35, 50, 75, 80};
-        int key = 70;
-        assert isPairedSum(arr, key);
-        /* 20 + 60 == 70 */
-
-        arr = new int[]{1, 2, 3, 4, 5, 6, 7};
-        key = 13;
-        assert isPairedSum(arr, key);
-        /* 6 + 7 == 13 */
-
-        key = 14;
-        assert !isPairedSum(arr, key);
+    private TwoPointers() {
     }
 
     /**
-     * Given a sorted array arr (sorted in ascending order). Find if there
-     * exists any pair of elements such that their sum is equal to key.
+     * Checks whether there exists a pair of elements in a sorted array whose sum equals the specified key.
      *
-     * @param arr the array contains elements
-     * @param key the number to search
-     * @return {@code true} if there exists a pair of elements, {@code false}
-     * otherwise.
+     * @param arr a sorted array of integers in ascending order (must not be null)
+     * @param key the target sum to find
+     * @return {@code true} if there exists at least one pair whose sum equals {@code key}, {@code false} otherwise
+     * @throws IllegalArgumentException if {@code arr} is {@code null}
      */
-    private static boolean isPairedSum(int[] arr, int key) {
-        /* array sorting is necessary for this algorithm to function correctly */
-        Arrays.sort(arr);
-        int i = 0;
-        /* index of first element */
-        int j = arr.length - 1;
-        /* index of last element */
+    public static boolean isPairedSum(int[] arr, int key) {
+        if (arr == null) {
+            throw new IllegalArgumentException("Input array must not be null.");
+        }
 
-        while (i < j) {
-            if (arr[i] + arr[j] == key) {
+        int left = 0;
+        int right = arr.length - 1;
+
+        while (left < right) {
+            int sum = arr[left] + arr[right];
+
+            if (sum == key) {
                 return true;
-            } else if (arr[i] + arr[j] < key) {
-                i++;
+            }
+            if (sum < key) {
+                left++;
             } else {
-                j--;
+                right--;
             }
         }
         return false;

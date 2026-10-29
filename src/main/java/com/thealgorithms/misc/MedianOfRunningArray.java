@@ -4,50 +4,74 @@ import java.util.Collections;
 import java.util.PriorityQueue;
 
 /**
- * @author shrutisheoran
+ * A generic abstract class to compute the median of a dynamically growing stream of numbers.
+ *
+ * @param <T> the number type, must extend Number and be Comparable
+ *
+ * Usage:
+ * Extend this class and implement {@code calculateAverage(T a, T b)} to define how averaging is done.
  */
-public class MedianOfRunningArray {
+public abstract class MedianOfRunningArray<T extends Number & Comparable<T>> {
 
-    private PriorityQueue<Integer> p1;
-    private PriorityQueue<Integer> p2;
+    private final PriorityQueue<T> maxHeap; // Lower half (max-heap)
+    private final PriorityQueue<T> minHeap; // Upper half (min-heap)
 
-    // Constructor
     public MedianOfRunningArray() {
-        this.p1 = new PriorityQueue<>(Collections.reverseOrder()); // Max Heap
-        this.p2 = new PriorityQueue<>(); // Min Heap
+        this.maxHeap = new PriorityQueue<>(Collections.reverseOrder());
+        this.minHeap = new PriorityQueue<>();
     }
 
-    /*
-      Inserting lower half of array to max Heap
-      and upper half to min heap
+    /**
+     * Inserts a new number into the data structure.
+     *
+     * @param element the number to insert
      */
-    public void insert(Integer e) {
-        p2.add(e);
-        if (p2.size() - p1.size() > 1) {
-            p1.add(p2.remove());
+    public final void insert(final T element) {
+        if (!minHeap.isEmpty() && element.compareTo(minHeap.peek()) < 0) {
+            maxHeap.offer(element);
+            balanceHeapsIfNeeded();
+        } else {
+            minHeap.offer(element);
+            balanceHeapsIfNeeded();
         }
     }
 
-    /*
-      Returns median at any given point
+    /**
+     * Returns the median of the current elements.
+     *
+     * @return the median value
+     * @throws IllegalArgumentException if no elements have been inserted
      */
-    public Integer median() {
-        if (p1.size() == p2.size()) {
-            return (p1.peek() + p2.peek()) / 2;
+    public final T getMedian() {
+        if (maxHeap.isEmpty() && minHeap.isEmpty()) {
+            throw new IllegalArgumentException("Median is undefined for an empty data set.");
         }
-        return p1.size() > p2.size() ? p1.peek() : p2.peek();
+
+        if (maxHeap.size() == minHeap.size()) {
+            return calculateAverage(maxHeap.peek(), minHeap.peek());
+        }
+
+        return (maxHeap.size() > minHeap.size()) ? maxHeap.peek() : minHeap.peek();
     }
 
-    public static void main(String[] args) {
-        /*
-        Testing the median function
-         */
+    /**
+     * Calculates the average between two values.
+     * Concrete subclasses must define how averaging works (e.g., for Integer, Double, etc.).
+     *
+     * @param a first number
+     * @param b second number
+     * @return the average of a and b
+     */
+    protected abstract T calculateAverage(T a, T b);
 
-        MedianOfRunningArray p = new MedianOfRunningArray();
-        int arr[] = {10, 7, 4, 9, 2, 3, 11, 17, 14};
-        for (int i = 0; i < 9; i++) {
-            p.insert(arr[i]);
-            System.out.print(p.median() + " ");
+    /**
+     * Balances the two heaps so that their sizes differ by at most 1.
+     */
+    private void balanceHeapsIfNeeded() {
+        if (maxHeap.size() > minHeap.size() + 1) {
+            minHeap.offer(maxHeap.poll());
+        } else if (minHeap.size() > maxHeap.size() + 1) {
+            maxHeap.offer(minHeap.poll());
         }
     }
 }

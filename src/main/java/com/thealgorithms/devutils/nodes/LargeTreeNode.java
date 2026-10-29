@@ -3,7 +3,7 @@ package com.thealgorithms.devutils.nodes;
 import java.util.Collection;
 
 /**
- * {@link TreeNode} extension that holds a {@link Collection} of refrences to
+ * {@link TreeNode} extension that holds a {@link Collection} of references to
  * child Nodes.
  *
  * @param <E> The type of the data held in the Node.
@@ -18,7 +18,7 @@ public class LargeTreeNode<E> extends TreeNode<E> {
     private Collection<LargeTreeNode<E>> childNodes;
 
     /**
-     * Empty contructor.
+     * Empty constructor.
      */
     public LargeTreeNode() {
         super();
@@ -64,7 +64,7 @@ public class LargeTreeNode<E> extends TreeNode<E> {
      */
     @Override
     public boolean isLeafNode() {
-        return (childNodes == null || childNodes.size() == 0);
+        return (childNodes == null || childNodes.isEmpty());
     }
 
     public Collection<LargeTreeNode<E>> getChildNodes() {

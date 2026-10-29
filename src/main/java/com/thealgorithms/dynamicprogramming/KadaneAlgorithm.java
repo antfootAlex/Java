@@ -1,54 +1,52 @@
 package com.thealgorithms.dynamicprogramming;
 
-import java.util.Scanner;
-
 /**
- * Program to implement Kadane’s Algorithm to calculate maximum contiguous
- * subarray sum of an array Time Complexity: O(n)
+ * This class implements Kadane's Algorithm to find the maximum subarray sum
+ * within a given array of integers. The algorithm efficiently computes the maximum
+ * sum of a contiguous subarray in linear time.
  *
- * @author Nishita Aggarwal
+ * Author: <a href="https://github.com/siddhant2002">Siddhant Swarup Mallick</a>
  */
-public class KadaneAlgorithm {
-
-    /**
-     * This method implements Kadane's Algorithm
-     *
-     * @param arr The input array
-     * @return The maximum contiguous subarray sum of the array
-     */
-    static int largestContiguousSum(int arr[]) {
-        int i, len = arr.length, cursum = 0, maxsum = Integer.MIN_VALUE;
-        if (len == 0) // empty array
-        {
-            return 0;
-        }
-        for (i = 0; i < len; i++) {
-            cursum += arr[i];
-            if (cursum > maxsum) {
-                maxsum = cursum;
-            }
-            if (cursum <= 0) {
-                cursum = 0;
-            }
-        }
-        return maxsum;
+public final class KadaneAlgorithm {
+    private KadaneAlgorithm() {
     }
 
     /**
-     * Main method
+     * Computes the maximum subarray sum using Kadane's Algorithm and checks
+     * if it matches a predicted answer.
      *
-     * @param args Command line arguments
+     * @param a              The input array of integers for which the maximum
+     *                       subarray sum is to be calculated.
+     * @param predictedAnswer The expected maximum subarray sum to be verified
+     *                       against the computed sum.
+     * @return true if the computed maximum subarray sum equals the predicted
+     *         answer, false otherwise.
+     *
+     * <p>Example:</p>
+     * <pre>
+     * Input: {89, 56, 98, 123, 26, 75, 12, 40, 39, 68, 91}
+     * Output: true if the maximum subarray sum is equal to the
+     *         predicted answer.
+     * </pre>
+     *
+     * <p>Algorithmic Complexity:</p>
+     * <ul>
+     * <li>Time Complexity: O(n) - the algorithm iterates through the array once.</li>
+     * <li>Auxiliary Space Complexity: O(1) - only a constant amount of additional space is used.</li>
+     * </ul>
      */
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        int n, arr[], i;
-        n = sc.nextInt();
-        arr = new int[n];
-        for (i = 0; i < n; i++) {
-            arr[i] = sc.nextInt();
+    public static boolean maxSum(int[] a, int predictedAnswer) {
+        int sum = a[0];
+        int runningSum = 0;
+
+        for (int k : a) {
+            runningSum += k;
+            sum = Math.max(sum, runningSum);
+            if (runningSum < 0) {
+                runningSum = 0;
+            }
         }
-        int maxContSum = largestContiguousSum(arr);
-        System.out.println(maxContSum);
-        sc.close();
+
+        return sum == predictedAnswer;
     }
 }
